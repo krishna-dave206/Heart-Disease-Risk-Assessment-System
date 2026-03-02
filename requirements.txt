@@ -1,4 +1,9 @@
 streamlit
 pandas
+<<<<<<< HEAD
 numpy
 scikit-learn==1.6.1
+=======
+scikit-learn
+numpy
+>>>>>>> d61a7c4 (Initial commit)
