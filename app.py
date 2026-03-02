@@ -13,43 +13,32 @@ st.set_page_config(
 # ------------------ CUSTOM STYLING ------------------
 st.markdown("""
 <style>
-
 .stApp {
     background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
     color: white;
 }
-
-/* Center headings */
 h1, h2, h3, h4 {
     text-align: center;
 }
-
-/* Animated Heart */
 .heart {
     font-size: 60px;
     text-align: center;
     animation: pulse 1.5s infinite;
     color: #ff4b4b;
 }
-
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.15); }
     100% { transform: scale(1); }
 }
-
-/* Button styling */
 .stButton>button {
     border-radius: 8px;
     height: 3em;
     font-size: 16px;
 }
-
-/* Padding */
 .block-container {
     padding-top: 2rem;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -62,7 +51,6 @@ st.divider()
 
 # ------------------ LOAD MODEL ------------------
 model_path = os.path.join(os.getcwd(), "model.pkl")
-
 model = pickle.load(open(model_path, "rb"))
 
 # ------------------ BASIC INFORMATION ------------------
@@ -74,10 +62,7 @@ with col1:
     age = st.slider("Age (years)", 1, 100, 50)
 
 with col2:
-    gender = st.selectbox(
-        "Gender",
-        ["Male", "Female"]
-    )
+    gender = st.selectbox("Gender", ["Male", "Female"])
 
 sex_value = 1 if gender == "Male" else 0
 
@@ -89,64 +74,33 @@ st.markdown("## Clinical Parameters")
 col1, col2 = st.columns(2)
 
 with col1:
-    cp = st.selectbox(
-        "Chest Pain Type",
-        [
-            "Typical Angina",
-            "Atypical Angina",
-            "Non-anginal Pain",
-            "Asymptomatic"
-        ]
+    cp = st.selectbox("Chest Pain Type",
+        ["Typical Angina", "Atypical Angina", "Non-anginal Pain", "Asymptomatic"]
     )
 
-    trestbps = st.number_input(
-        "Resting Blood Pressure (mm Hg)",
-        80, 200, 120
-    )
-
-    chol = st.number_input(
-        "Cholesterol (mg/dl)",
-        100, 400, 200
-    )
-
-    thalach = st.number_input(
-        "Maximum Heart Rate Achieved",
-        60, 220, 150
-    )
+    trestbps = st.number_input("Resting Blood Pressure (mm Hg)", 80, 200, 120)
+    chol = st.number_input("Cholesterol (mg/dl)", 100, 400, 200)
+    thalach = st.number_input("Maximum Heart Rate Achieved", 60, 220, 150)
 
 with col2:
-    fbs_option = st.selectbox(
-        "Fasting Blood Sugar",
+    fbs_option = st.selectbox("Fasting Blood Sugar",
         ["≤ 120 mg/dl (Normal)", "> 120 mg/dl (High)"]
     )
 
-    restecg = st.selectbox(
-        "Resting ECG Results",
+    restecg = st.selectbox("Resting ECG Results",
         ["Normal", "ST-T Wave Abnormality", "Left Ventricular Hypertrophy"]
     )
 
-    exang_option = st.selectbox(
-        "Exercise Induced Angina",
-        ["No", "Yes"]
-    )
+    exang_option = st.selectbox("Exercise Induced Angina", ["No", "Yes"])
+    oldpeak = st.number_input("ST Depression (Oldpeak)", 0.0, 6.0, 1.0)
 
-    oldpeak = st.number_input(
-        "ST Depression (Oldpeak)",
-        0.0, 6.0, 1.0
-    )
-
-    slope = st.selectbox(
-        "Slope of ST Segment",
+    slope = st.selectbox("Slope of ST Segment",
         ["Upsloping", "Flat", "Downsloping"]
     )
 
-    ca = st.selectbox(
-        "Number of Major Vessels (0–4)",
-        [0, 1, 2, 3, 4]
-    )
+    ca = st.selectbox("Number of Major Vessels (0–4)", [0, 1, 2, 3, 4])
 
-    thal = st.selectbox(
-        "Thalassemia",
+    thal = st.selectbox("Thalassemia",
         ["Normal", "Fixed Defect", "Reversible Defect", "Other"]
     )
 
@@ -182,47 +136,46 @@ fbs_value = 1 if "> 120" in fbs_option else 0
 exang_value = 1 if exang_option == "Yes" else 0
 
 # ------------------ PREDICTION ------------------
-
 st.divider()
 
 if st.button("Analyze Risk"):
 
     input_dict = {
         "age": int(age),
-        "sex": sex_value,
-        "cp": cp_map[cp],
+        "sex": int(sex_value),
+        "cp": int(cp_map[cp]),
         "trestbps": float(trestbps),
         "chol": float(chol),
-        "fbs": fbs_value,
-        "restecg": restecg_map[restecg],
+        "fbs": int(fbs_value),
+        "restecg": int(restecg_map[restecg]),
         "thalch": float(thalach),
-        "exang": exang_value,
+        "exang": int(exang_value),
         "oldpeak": float(oldpeak),
-        "slope": slope_map[slope],
-        "ca": float(ca),
-        "thal": thal_map[thal]
+        "slope": int(slope_map[slope]),
+        "ca": int(ca),
+        "thal": int(thal_map[thal])
     }
 
-
     input_df = pd.DataFrame([input_dict])
+
+    # Ensure exact dtype match
     input_df = input_df.astype({
-    "age": "int64",
-    "sex": "int64",
-    "cp": "int64",
-    "trestbps": "float64",
-    "chol": "float64",
-    "fbs": "int64",
-    "restecg": "int64",
-    "thalch": "float64",
-    "exang": "int64",
-    "oldpeak": "float64",
-    "slope": "int64",
-    "ca": "int64",
-    "thal": "int64"
-})
+        "age": "int64",
+        "sex": "int64",
+        "cp": "int64",
+        "trestbps": "float64",
+        "chol": "float64",
+        "fbs": "int64",
+        "restecg": "int64",
+        "thalch": "float64",
+        "exang": "int64",
+        "oldpeak": "float64",
+        "slope": "int64",
+        "ca": "int64",
+        "thal": "int64"
+    })
 
     with st.spinner("Analyzing patient data..."):
-        # input_scaled = scaler.transform(input_df)
         prediction = model.predict(input_df)[0]
         probability = model.predict_proba(input_df)[0][1]
 
