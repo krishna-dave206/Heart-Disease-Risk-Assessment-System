@@ -116,7 +116,7 @@ if st.button("Analyze Risk"):
         "chol": chol,
         "fbs": fbs,
         "restecg": restecg,
-        "thalach": thalach,
+        "thalch": thalach,
         "exang": exang,
         "oldpeak": oldpeak,
         "slope": slope,
