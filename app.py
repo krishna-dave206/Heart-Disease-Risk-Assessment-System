@@ -205,7 +205,23 @@ if st.button("Analyze Risk"):
         "thal": thal_map[thal]
     }
 
+
     input_df = pd.DataFrame([input_dict])
+    input_df = input_df.astype({
+    "age": "int64",
+    "sex": "int64",
+    "cp": "int64",
+    "trestbps": "float64",
+    "chol": "float64",
+    "fbs": "int64",
+    "restecg": "int64",
+    "thalch": "float64",
+    "exang": "int64",
+    "oldpeak": "float64",
+    "slope": "int64",
+    "ca": "int64",
+    "thal": "int64"
+})
 
     with st.spinner("Analyzing patient data..."):
         # input_scaled = scaler.transform(input_df)
