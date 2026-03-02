@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# ------------------ CUSTOM STYLING ------------------
+# ------------------ STYLING ------------------
 st.markdown("""
 <style>
 .stApp {
@@ -53,7 +53,7 @@ st.divider()
 model_path = os.path.join(os.getcwd(), "model.pkl")
 model = pickle.load(open(model_path, "rb"))
 
-# ------------------ BASIC INFORMATION ------------------
+# ------------------ BASIC INFO ------------------
 st.markdown("## Basic Information")
 
 col1, col2 = st.columns(2)
@@ -62,9 +62,7 @@ with col1:
     age = st.slider("Age (years)", 1, 100, 50)
 
 with col2:
-    gender = st.selectbox("Gender", ["Male", "Female"])
-
-sex_value = 1 if gender == "Male" else 0
+    sex = st.selectbox("Sex", ["Male", "Female"])
 
 st.divider()
 
@@ -83,15 +81,15 @@ with col1:
     thalach = st.number_input("Maximum Heart Rate Achieved", 60, 220, 150)
 
 with col2:
-    fbs_option = st.selectbox("Fasting Blood Sugar",
-        ["≤ 120 mg/dl (Normal)", "> 120 mg/dl (High)"]
+    fbs = st.selectbox("Fasting Blood Sugar",
+        ["≤ 120 mg/dl", "> 120 mg/dl"]
     )
 
     restecg = st.selectbox("Resting ECG Results",
         ["Normal", "ST-T Wave Abnormality", "Left Ventricular Hypertrophy"]
     )
 
-    exang_option = st.selectbox("Exercise Induced Angina", ["No", "Yes"])
+    exang = st.selectbox("Exercise Induced Angina", ["No", "Yes"])
     oldpeak = st.number_input("ST Depression (Oldpeak)", 0.0, 6.0, 1.0)
 
     slope = st.selectbox("Slope of ST Segment",
@@ -104,76 +102,29 @@ with col2:
         ["Normal", "Fixed Defect", "Reversible Defect", "Other"]
     )
 
-# ------------------ VALUE MAPPING ------------------
-
-cp_map = {
-    "Typical Angina": 0,
-    "Atypical Angina": 1,
-    "Non-anginal Pain": 2,
-    "Asymptomatic": 3
-}
-
-restecg_map = {
-    "Normal": 0,
-    "ST-T Wave Abnormality": 1,
-    "Left Ventricular Hypertrophy": 2
-}
-
-slope_map = {
-    "Upsloping": 0,
-    "Flat": 1,
-    "Downsloping": 2
-}
-
-thal_map = {
-    "Normal": 0,
-    "Fixed Defect": 1,
-    "Reversible Defect": 2,
-    "Other": 3
-}
-
-fbs_value = 1 if "> 120" in fbs_option else 0
-exang_value = 1 if exang_option == "Yes" else 0
-
 # ------------------ PREDICTION ------------------
 st.divider()
 
 if st.button("Analyze Risk"):
 
+    # IMPORTANT: Send raw values exactly like training data
     input_dict = {
-        "age": int(age),
-        "sex": int(sex_value),
-        "cp": int(cp_map[cp]),
-        "trestbps": float(trestbps),
-        "chol": float(chol),
-        "fbs": int(fbs_value),
-        "restecg": int(restecg_map[restecg]),
-        "thalch": float(thalach),
-        "exang": int(exang_value),
-        "oldpeak": float(oldpeak),
-        "slope": int(slope_map[slope]),
-        "ca": int(ca),
-        "thal": int(thal_map[thal])
+        "age": age,
+        "sex": sex,
+        "cp": cp,
+        "trestbps": trestbps,
+        "chol": chol,
+        "fbs": fbs,
+        "restecg": restecg,
+        "thalach": thalach,
+        "exang": exang,
+        "oldpeak": oldpeak,
+        "slope": slope,
+        "ca": ca,
+        "thal": thal
     }
 
     input_df = pd.DataFrame([input_dict])
-
-    # Ensure exact dtype match
-    input_df = input_df.astype({
-        "age": "int64",
-        "sex": "int64",
-        "cp": "int64",
-        "trestbps": "float64",
-        "chol": "float64",
-        "fbs": "int64",
-        "restecg": "int64",
-        "thalch": "float64",
-        "exang": "int64",
-        "oldpeak": "float64",
-        "slope": "int64",
-        "ca": "int64",
-        "thal": "int64"
-    })
 
     with st.spinner("Analyzing patient data..."):
         prediction = model.predict(input_df)[0]
