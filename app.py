@@ -191,18 +191,18 @@ if st.button("Analyze Risk"):
 
     input_dict = {
         "age": int(age),
-        "sex": str(sex_value),
-        "cp": str(cp_map[cp]),
+        "sex": sex_value,
+        "cp": cp_map[cp],
         "trestbps": float(trestbps),
         "chol": float(chol),
-        "fbs": str(fbs_value),
-        "restecg": str(restecg_map[restecg]),
+        "fbs": fbs_value,
+        "restecg": restecg_map[restecg],
         "thalch": float(thalach),
-        "exang": str(exang_value),
+        "exang": exang_value,
         "oldpeak": float(oldpeak),
-        "slope": str(slope_map[slope]),
+        "slope": slope_map[slope],
         "ca": float(ca),
-        "thal": str(thal_map[thal])
+        "thal": thal_map[thal]
     }
 
     input_df = pd.DataFrame([input_dict])
