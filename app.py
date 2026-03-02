@@ -62,10 +62,8 @@ st.divider()
 
 # ------------------ LOAD MODEL ------------------
 model_path = os.path.join(os.getcwd(), "model.pkl")
-# scaler_path = os.path.join(os.getcwd(), "scaler.pkl")
 
 model = pickle.load(open(model_path, "rb"))
-# scaler = pickle.load(open(scaler_path, "rb"))
 
 # ------------------ BASIC INFORMATION ------------------
 st.markdown("## Basic Information")
