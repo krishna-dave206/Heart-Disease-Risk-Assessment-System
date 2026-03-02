@@ -1,6 +1,7 @@
 import streamlit as st
 import pickle
 import pandas as pd
+import os
 
 # ------------------ PAGE CONFIG ------------------
 st.set_page_config(
@@ -60,7 +61,11 @@ st.markdown("<h4>AI-Powered Clinical Decision Support System</h4>", unsafe_allow
 st.divider()
 
 # ------------------ LOAD MODEL ------------------
-model = pickle.load(open("model.pkl", "rb"))
+model_path = os.path.join(os.getcwd(), "model.pkl")
+scaler_path = os.path.join(os.getcwd(), "scaler.pkl")
+
+model = pickle.load(open(model_path, "rb"))
+scaler = pickle.load(open(scaler_path, "rb"))
 
 # ------------------ BASIC INFORMATION ------------------
 st.markdown("## Basic Information")
@@ -203,8 +208,9 @@ if st.button("Analyze Risk"):
     input_df = pd.DataFrame([input_dict])
 
     with st.spinner("Analyzing patient data..."):
-        prediction = model.predict(input_df)[0]
-        probability = model.predict_proba(input_df)[0][1]
+        input_scaled = scaler.transform(input_df)
+        prediction = model.predict(input_scaled)[0]
+        probability = model.predict_proba(input_scaled)[0][1]
 
     st.divider()
     st.markdown("## Risk Assessment Result")
