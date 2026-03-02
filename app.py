@@ -62,10 +62,10 @@ st.divider()
 
 # ------------------ LOAD MODEL ------------------
 model_path = os.path.join(os.getcwd(), "model.pkl")
-scaler_path = os.path.join(os.getcwd(), "scaler.pkl")
+# scaler_path = os.path.join(os.getcwd(), "scaler.pkl")
 
 model = pickle.load(open(model_path, "rb"))
-scaler = pickle.load(open(scaler_path, "rb"))
+# scaler = pickle.load(open(scaler_path, "rb"))
 
 # ------------------ BASIC INFORMATION ------------------
 st.markdown("## Basic Information")
@@ -208,9 +208,9 @@ if st.button("Analyze Risk"):
     input_df = pd.DataFrame([input_dict])
 
     with st.spinner("Analyzing patient data..."):
-        input_scaled = scaler.transform(input_df)
-        prediction = model.predict(input_scaled)[0]
-        probability = model.predict_proba(input_scaled)[0][1]
+        # input_scaled = scaler.transform(input_df)
+        prediction = model.predict(input_df)[0]
+        probability = model.predict_proba(input_df)[0][1]
 
     st.divider()
     st.markdown("## Risk Assessment Result")
