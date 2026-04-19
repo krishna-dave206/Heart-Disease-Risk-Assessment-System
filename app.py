@@ -11,8 +11,8 @@ load_dotenv()
 st.set_page_config(page_title="Heart Risk AI", page_icon="❤️", layout="centered")
 
 # ------------------ OPENAI CLIENT (BUG FIX #1) ------------------
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None  # was never instantiated before
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = OpenAI(api_key=GROQ_API_KEY) if GROQ_API_KEY else None  # was never instantiated before
 
 # ------------------ LOAD MODEL (BUG FIX #2) ------------------
 @st.cache_resource
@@ -132,7 +132,7 @@ if st.button("🔍 Analyze Risk", use_container_width=True):
 
     # ------------------ AI EXPLANATION (BUG FIX #3) ------------------
     if client is None:
-        st.warning("⚠️ OPENAI_API_KEY not set in .env — skipping AI explanation.")
+        st.warning("⚠️ GROQ_API_KEY not set in .env — skipping AI explanation.")
     else:
         with st.spinner("Generating clinical insight..."):
             prompt = f"""
