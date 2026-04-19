@@ -1,20 +1,28 @@
 import streamlit as st
 import pickle
 import pandas as pd
-from dotenv import load_dotenv
 import os
-from openai import OpenAI
 
-load_dotenv()
+
+try:
+    from groq import Groq
+    GROQ_AVAILABLE = True
+except ImportError:
+    GROQ_AVAILABLE = False
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # ------------------ CONFIG ------------------
 st.set_page_config(page_title="Heart Risk AI", page_icon="❤️", layout="centered")
 
-# ------------------ OPENAI CLIENT (BUG FIX #1) ------------------
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-client = OpenAI(api_key=GROQ_API_KEY) if GROQ_API_KEY else None  # was never instantiated before
 
-# ------------------ LOAD MODEL (BUG FIX #2) ------------------
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=GROQ_API_KEY) if (GROQ_AVAILABLE and GROQ_API_KEY) else None
+
+
 @st.cache_resource
 def load_model():
     try:
@@ -89,7 +97,7 @@ if st.button("🔍 Analyze Risk", use_container_width=True):
         "chol": chol,
         "fbs": fbs,
         "restecg": restecg,
-        "thalch": thalach,      # exact column name the model was trained on
+        "thalch": thalach,
         "exang": exang,
         "oldpeak": oldpeak,
         "slope": slope,
@@ -97,7 +105,6 @@ if st.button("🔍 Analyze Risk", use_container_width=True):
         "thal": thal
     }])
 
-    # Force categorical columns to string (prevents dtype mismatch errors)
     cat_cols = ["sex", "cp", "fbs", "restecg", "exang", "slope", "thal"]
     input_df[cat_cols] = input_df[cat_cols].astype(str)
 
@@ -115,24 +122,22 @@ if st.button("🔍 Analyze Risk", use_container_width=True):
     st.markdown("---")
     st.subheader("📊 Assessment Result")
 
-    # Colour-coded risk band
     if risk_pct >= 65:
         css_class, label = "high-risk", "⚠️ High Risk"
     elif risk_pct >= 35:
-        css_class, label = "med-risk",  "🟡 Moderate Risk"
+        css_class, label = "med-risk", "🟡 Moderate Risk"
     else:
-        css_class, label = "low-risk",  "✅ Low Risk"
+        css_class, label = "low-risk", "✅ Low Risk"
 
     st.markdown(
         f'<div class="risk-box {css_class}">{label} — {risk_pct:.1f}% probability of heart disease</div>',
         unsafe_allow_html=True
     )
-
     st.progress(min(prob, 1.0))
 
-    # ------------------ AI EXPLANATION (BUG FIX #3) ------------------
+    # ------------------ AI EXPLANATION (GROQ) ------------------
     if client is None:
-        st.warning("⚠️ GROQ_API_KEY not set in .env — skipping AI explanation.")
+        st.warning("⚠️ GROQ_API_KEY not set — skipping AI explanation.")
     else:
         with st.spinner("Generating clinical insight..."):
             prompt = f"""
@@ -144,20 +149,20 @@ Patient Data:
 Predicted Risk: {risk_pct:.1f}%
 Classification: {"High Risk" if prediction == 1 else "Low Risk"}
 
-In 3–4 sentences, provide:
+In 3-4 sentences, provide:
 1. A brief clinical interpretation of the key risk factors.
 2. Specific, actionable prevention or follow-up advice.
 Keep language clear and suitable for a clinician reading quickly.
 """
             try:
                 response = client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model="llama3-8b-8192",
                     messages=[{"role": "user", "content": prompt}]
                 )
                 ai_text = response.choices[0].message.content
                 st.markdown("### 🤖 AI Clinical Recommendation")
                 st.info(ai_text)
             except Exception as e:
-                st.error(f"❌ OpenAI call failed: {e}")
+                st.error(f"❌ Groq API call failed: {e}")
 
     st.caption("⚠️ This tool is for decision support only and does not replace professional medical diagnosis.")
