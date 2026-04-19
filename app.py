@@ -156,7 +156,7 @@ Keep language clear and suitable for a clinician reading quickly.
 """
             try:
                 response = client.chat.completions.create(
-                    model="llama3-8b-8192",
+                    model="llama-3.1-8b-instant",
                     messages=[{"role": "user", "content": prompt}]
                 )
                 ai_text = response.choices[0].message.content
