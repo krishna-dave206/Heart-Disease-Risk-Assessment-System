@@ -1,14 +1,16 @@
 import streamlit as st
 import pickle
 import pandas as pd
+from dotenv import load_dotenv
 import os
 from openai import OpenAI
+load_dotenv()
 
 # ------------------ CONFIG ------------------
 st.set_page_config(page_title="Heart Risk AI", page_icon="❤")
 
 # ------------------ OPENAI ------------------
-OPENAI_API_KEY = os.getenv("REMOVED_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # ------------------ LOAD MODEL ------------------
 model = pickle.load(open("model.pkl", "rb"))
