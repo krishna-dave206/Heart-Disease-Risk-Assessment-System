@@ -125,7 +125,7 @@ if st.button("Analyze Risk"):
         "chol": chol,
         "fbs": fbs,
         "restecg": restecg_map[restecg],
-        "thalach": thalach,   # FIXED NAME
+        "thalch": thalach,   # FIXED NAME
         "exang": exang,
         "oldpeak": oldpeak,
         "slope": slope_map[slope],
@@ -134,6 +134,7 @@ if st.button("Analyze Risk"):
     }
 
     input_df = pd.DataFrame([input_dict])
+    
 
     with st.spinner("Analyzing..."):
         prediction = model.predict(input_df)[0]
